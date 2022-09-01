@@ -36,7 +36,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
     current_node->FindNeighbors();
     for (RouteModel::Node *neighbor: current_node->neighbors) {
         if (!neighbor->visited) {
-            neighbor->g_value = current_node->distance(*neighbor);
+            neighbor->g_value = current_node->g_value + neighbor->distance(*current_node);
             neighbor->h_value = this->CalculateHValue(neighbor);
             neighbor->parent = current_node;
             neighbor->visited = true;
@@ -55,7 +55,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 
 RouteModel::Node *RoutePlanner::NextNode() {
     std::sort(this->open_list.begin(), this->open_list.end(), [](RouteModel::Node *a, RouteModel::Node *b) -> bool {
-            return a->g_value + a->h_value > b->g_value + b->h_value;
+            return (a->g_value + a->h_value) > (b->g_value + b->h_value);
     });
     RouteModel::Node *next_node = this->open_list.back();
     this->open_list.pop_back();
@@ -73,7 +73,8 @@ RouteModel::Node *RoutePlanner::NextNode() {
 
 std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node *current_node) {
     // Create path_found vector
-    distance = 0.0f;
+    // distance is simply the last node g value
+    distance = current_node->g_value;
     std::vector<RouteModel::Node> path_found;
 
     // add current node to path and get the parent of the current node to start the recursion
@@ -82,15 +83,19 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     
     // traverse back until start node is reached, calculate distance while traversing
     while (parent_node != this->start_node) {
-        distance += current_node->distance(*parent_node);
+        // distance += current_node->distance(*parent_node);
         path_found.push_back(*parent_node);
 
         current_node = parent_node;
         parent_node = parent_node->parent;
     }
+    // add starting node last
+    path_found.push_back(*this->start_node);
+    // distance += current_node->distance(*this->start_node);
+    
     // as the path_found is in reverse order, reverse it from start to end
     std::reverse(path_found.begin(), path_found.end());
-
+    
     distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
     return path_found;
 
@@ -107,6 +112,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 void RoutePlanner::AStarSearch() {
     RouteModel::Node *current_node = nullptr;
 
+    this->start_node->visited = true;
     this->AddNeighbors(this->start_node);
     while (this->open_list.size() > 0) {
         current_node = this->NextNode();
