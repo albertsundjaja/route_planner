@@ -11,7 +11,7 @@ A project which demonstrates the use of A* algorithm to find the shortest path b
 * gcc/g++ 7.4.0
 * [IO2D]https://github.com/cpp-io2d/P0267_RefImpl/blob/master/BUILDING.md
 
-Tested on Ubuntu 22.04
+Tested on Ubuntu 16.04
 
 IO2D installation instruction for Ubuntu
 
