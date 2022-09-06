@@ -9,7 +9,7 @@ A project which demonstrates the use of A* algorithm to find the shortest path b
 * cmake 3.11.3
 * make 4.1 (Linux)
 * gcc/g++ 7.4.0
-* [IO2D]https://github.com/cpp-io2d/P0267_RefImpl/blob/master/BUILDING.md
+* [IO2D](https://github.com/cpp-io2d/P0267_RefImpl/blob/master/BUILDING.md)
 
 Tested on Ubuntu 16.04
 
